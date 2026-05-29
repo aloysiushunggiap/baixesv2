@@ -1,0 +1,66 @@
+enum Role {
+  ROLE_USER,
+  ROLE_ADMIN
+}
+
+enum PasswordResetStatus {
+  PENDING,
+  APPROVED,
+  REJECTED
+}
+
+entity Student {
+  studentCode String required minlength(8) maxlength(8) unique
+  name String required
+  licensePlate String required
+  cardId String required unique
+  username String required unique
+  cardSecret String required maxlength(128)
+  tokenVersion Long required
+  enabled Boolean required
+}
+
+entity ParkingLog {
+  cardId String required
+  checkInTime Instant required
+  checkOutTime Instant
+  durationMinutes Long required
+  entryFee Long required
+  amount Long required
+}
+
+entity ParkingPriceRule {
+  startTime ZonedDateTime required
+  endTime ZonedDateTime required
+  pricePerHour Long required
+  weekday Boolean required
+  weekend Boolean required
+  active Boolean required
+}
+
+entity MonthlyReport {
+  cardId String required
+  month Integer required min(1) max(12)
+  year Integer required
+  totalMinutes Long required
+  totalAmount Long required
+}
+
+entity PasswordResetRequest {
+  studentId String required
+  name String required
+  licensePlate String required
+  username String required
+  newPasswordHash String required maxlength(255)
+  status PasswordResetStatus required
+  requestedAt Instant required
+  processedAt Instant
+  processedBy String
+  rejectReason String
+}
+
+dto * with mapstruct
+service * with serviceClass
+paginate Student, ParkingLog, ParkingPriceRule, MonthlyReport, PasswordResetRequest with pagination
+filter Student, ParkingLog, ParkingPriceRule, MonthlyReport, PasswordResetRequest
+microservice * with parking

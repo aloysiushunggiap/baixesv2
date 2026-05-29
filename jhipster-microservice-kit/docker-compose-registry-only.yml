@@ -1,0 +1,9 @@
+version: '2'
+services:
+  jhipster-registry:
+    image: jhipster/jhipster-registry:v6.4.0
+    ports:
+      - '8761:8761'
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev,native
+      - JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET=MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=

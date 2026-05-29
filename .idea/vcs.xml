@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/baixesv" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/baixesv-ms/gateway" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/baixesv-ms/parking" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/baixesv-ms/uaa" vcs="Git" />
+  </component>
+</project>

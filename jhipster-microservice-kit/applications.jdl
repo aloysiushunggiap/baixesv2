@@ -1,0 +1,61 @@
+application {
+  config {
+    baseName uaa
+    applicationType uaa
+    packageName com.baixesv.uaa
+    authenticationType uaa
+    buildTool gradle
+    databaseType sql
+    devDatabaseType mysql
+    prodDatabaseType mysql
+    cacheProvider ehcache
+    enableHibernateCache true
+    serviceDiscoveryType eureka
+    serverPort 9999
+    skipClient true
+    testFrameworks []
+  }
+}
+
+application {
+  config {
+    baseName parking
+    applicationType microservice
+    packageName com.baixesv.parking
+    authenticationType uaa
+    uaaBaseName "uaa"
+    buildTool gradle
+    databaseType sql
+    devDatabaseType mysql
+    prodDatabaseType mysql
+    cacheProvider ehcache
+    enableHibernateCache true
+    serviceDiscoveryType eureka
+    serverPort 8081
+    skipClient true
+    testFrameworks []
+  }
+  entities Student, ParkingLog, ParkingPriceRule, MonthlyReport, PasswordResetRequest
+}
+
+application {
+  config {
+    baseName gateway
+    applicationType gateway
+    packageName com.baixesv.gateway
+    authenticationType uaa
+    uaaBaseName "uaa"
+    buildTool gradle
+    databaseType sql
+    devDatabaseType mysql
+    prodDatabaseType mysql
+    cacheProvider ehcache
+    enableHibernateCache true
+    serviceDiscoveryType eureka
+    serverPort 8080
+    clientFramework angularX
+    clientPackageManager npm
+    testFrameworks []
+  }
+  entities Student, ParkingLog, ParkingPriceRule, MonthlyReport, PasswordResetRequest
+}

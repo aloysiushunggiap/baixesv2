@@ -1,0 +1,36 @@
+version: '2'
+services:
+  jhipster-registry:
+    image: jhipster/jhipster-registry:v6.4.0
+    ports:
+      - '8761:8761'
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev,native
+      - JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET=MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=
+
+  mysql-uaa:
+    image: mysql:8.0
+    ports:
+      - '3307:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=1111
+      - MYSQL_DATABASE=uaa
+    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
+
+  mysql-gateway:
+    image: mysql:8.0
+    ports:
+      - '3308:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=1111
+      - MYSQL_DATABASE=gateway
+    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
+
+  mysql-parking:
+    image: mysql:8.0
+    ports:
+      - '3309:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=1111
+      - MYSQL_DATABASE=parking
+    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
