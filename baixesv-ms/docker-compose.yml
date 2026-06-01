@@ -22,13 +22,16 @@ services:
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:admin@jhipster-registry:8761/eureka
       - SPRING_CLOUD_CONFIG_URI=http://admin:admin@jhipster-registry:8761/config
-      - SPRING_DATASOURCE_URL=jdbc:mysql://gateway-mysql:3306/gateway?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:gateway;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
+      - SPRING_DATASOURCE_USERNAME=gateway
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_JPA_DATABASE_PLATFORM=io.github.jhipster.domain.util.FixedH2Dialect
       - JHIPSTER_SLEEP=60
     ports:
       - '8080:8080'
     depends_on:
       - jhipster-registry
-      - gateway-mysql
       - uaa-app
       - parking-app
 
@@ -40,13 +43,16 @@ services:
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:admin@jhipster-registry:8761/eureka
       - SPRING_CLOUD_CONFIG_URI=http://admin:admin@jhipster-registry:8761/config
-      - SPRING_DATASOURCE_URL=jdbc:mysql://uaa-mysql:3306/uaa?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:uaa;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
+      - SPRING_DATASOURCE_USERNAME=uaa
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_JPA_DATABASE_PLATFORM=io.github.jhipster.domain.util.FixedH2Dialect
       - JHIPSTER_SLEEP=60
     ports:
       - '9999:9999'
     depends_on:
       - jhipster-registry
-      - uaa-mysql
 
   parking-app:
     image: parking
@@ -56,32 +62,12 @@ services:
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:admin@jhipster-registry:8761/eureka
       - SPRING_CLOUD_CONFIG_URI=http://admin:admin@jhipster-registry:8761/config
-      - SPRING_DATASOURCE_URL=jdbc:mysql://parking-mysql:3306/parking?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/baixesv_parking?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1111
       - JHIPSTER_SLEEP=60
     ports:
       - '8081:8081'
     depends_on:
       - jhipster-registry
-      - parking-mysql
       - uaa-app
-
-  gateway-mysql:
-    image: mysql:8.0.20
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-      - MYSQL_DATABASE=gateway
-    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
-
-  uaa-mysql:
-    image: mysql:8.0.20
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-      - MYSQL_DATABASE=uaa
-    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
-
-  parking-mysql:
-    image: mysql:8.0.20
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-      - MYSQL_DATABASE=parking
-    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp

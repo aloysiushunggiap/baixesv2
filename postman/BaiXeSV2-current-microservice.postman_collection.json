@@ -1,0 +1,382 @@
+{
+  "info": {
+    "_postman_id": "5e51bb46-f4d2-42de-8028-baixesv2",
+    "name": "BaiXeSV2 Current Microservice",
+    "description": "Postman collection for the current BaiXeSV2 JHipster microservice setup. Import this file, run Auth/Login first, then call Parking APIs through the Gateway.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "gatewayUrl", "value": "http://localhost:8080" },
+    { "key": "uaaUrl", "value": "http://localhost:9999" },
+    { "key": "clientId", "value": "web_app" },
+    { "key": "clientSecret", "value": "changeit" },
+    { "key": "username", "value": "admin" },
+    { "key": "password", "value": "admin" },
+    { "key": "access_token", "value": "" },
+    { "key": "refresh_token", "value": "" },
+    { "key": "card_id", "value": "CARD001" },
+    { "key": "student_id", "value": "" },
+    { "key": "parking_log_id", "value": "" },
+    { "key": "price_rule_id", "value": "" },
+    { "key": "monthly_report_id", "value": "" },
+    { "key": "password_reset_request_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login - Password Grant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login returns access token', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.access_token).to.exist;",
+                  "  pm.collectionVariables.set('access_token', json.access_token);",
+                  "  if (json.refresh_token) pm.collectionVariables.set('refresh_token', json.refresh_token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{clientId}}", "type": "string" },
+                { "key": "password", "value": "{{clientSecret}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "password", "type": "text" },
+                { "key": "username", "value": "{{username}}", "type": "text" },
+                { "key": "password", "value": "{{password}}", "type": "text" }
+              ]
+            },
+            "url": "{{uaaUrl}}/oauth/token"
+          }
+        },
+        {
+          "name": "Refresh Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Refresh returns access token', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.access_token).to.exist;",
+                  "  pm.collectionVariables.set('access_token', json.access_token);",
+                  "  if (json.refresh_token) pm.collectionVariables.set('refresh_token', json.refresh_token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{clientId}}", "type": "string" },
+                { "key": "password", "value": "{{clientSecret}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "refresh_token", "type": "text" },
+                { "key": "refresh_token", "value": "{{refresh_token}}", "type": "text" }
+              ]
+            },
+            "url": "{{uaaUrl}}/oauth/token"
+          }
+        },
+        {
+          "name": "Token Public Key",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{uaaUrl}}/oauth/token_key"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Gateway Health",
+          "request": { "method": "GET", "header": [], "url": "{{gatewayUrl}}/management/health" }
+        },
+        {
+          "name": "Parking Health",
+          "request": { "method": "GET", "header": [], "url": "{{gatewayUrl}}/services/parking/management/health" }
+        },
+        {
+          "name": "Gateway Routes",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": "{{gatewayUrl}}/api/gateway/routes"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parking User Flow",
+      "item": [
+        {
+          "name": "Swipe Card - Check In Or Check Out",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [],
+            "url": "{{gatewayUrl}}/services/parking/api/parking/swipe?cardId={{card_id}}"
+          }
+        },
+        {
+          "name": "Simulate Fee",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"checkInTime\": \"2026-06-01T01:00:00Z\",\n  \"checkOutTime\": \"2026-06-01T03:30:00Z\"\n}"
+            },
+            "url": "{{gatewayUrl}}/services/parking/api/parking/simulate-fee"
+          }
+        },
+        {
+          "name": "Monthly History By Card",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": "{{gatewayUrl}}/services/parking/api/parking/history?cardId={{card_id}}"
+          }
+        },
+        {
+          "name": "Delete Card And Related Data",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "DELETE",
+            "header": [],
+            "url": "{{gatewayUrl}}/services/parking/api/parking/delete-card?cardId={{card_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "List Students",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": "{{gatewayUrl}}/services/parking/api/students?page=0&size=20&sort=id,desc"
+          }
+        },
+        {
+          "name": "Create Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('student_id', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentCode\": \"SV001\",\n  \"name\": \"Nguyen Van A\",\n  \"licensePlate\": \"59A1-12345\",\n  \"cardId\": \"CARD001\",\n  \"username\": \"nguyenvana\",\n  \"cardSecret\": \"secret001\",\n  \"tokenVersion\": 1,\n  \"enabled\": true\n}"
+            },
+            "url": "{{gatewayUrl}}/services/parking/api/students"
+          }
+        },
+        {
+          "name": "Get Student By Id",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": "{{gatewayUrl}}/services/parking/api/students/{{student_id}}"
+          }
+        },
+        {
+          "name": "Delete Student By Id",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "DELETE",
+            "header": [],
+            "url": "{{gatewayUrl}}/services/parking/api/students/{{student_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parking Logs",
+      "item": [
+        {
+          "name": "List Parking Logs",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": "{{gatewayUrl}}/services/parking/api/parking-logs?page=0&size=20&sort=id,desc"
+          }
+        },
+        {
+          "name": "Create Parking Log",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) pm.collectionVariables.set('parking_log_id', pm.response.json().id);"] }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardId\": \"CARD001\",\n  \"checkInTime\": \"2026-06-01T08:00:00Z\",\n  \"checkOutTime\": \"2026-06-01T10:30:00Z\",\n  \"durationMinutes\": 150,\n  \"entryFee\": 5000,\n  \"amount\": 15000\n}"
+            },
+            "url": "{{gatewayUrl}}/services/parking/api/parking-logs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parking Price Rules",
+      "item": [
+        {
+          "name": "List Parking Price Rules",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": "{{gatewayUrl}}/services/parking/api/parking-price-rules?page=0&size=20&sort=id,desc"
+          }
+        },
+        {
+          "name": "Create Parking Price Rule",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) pm.collectionVariables.set('price_rule_id', pm.response.json().id);"] }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startTime\": \"2026-06-01T00:00:00Z\",\n  \"endTime\": \"2026-06-01T23:59:59Z\",\n  \"pricePerHour\": 5000,\n  \"weekday\": true,\n  \"weekend\": true,\n  \"active\": true\n}"
+            },
+            "url": "{{gatewayUrl}}/services/parking/api/parking-price-rules"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Monthly Reports",
+      "item": [
+        {
+          "name": "List Monthly Reports",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": "{{gatewayUrl}}/services/parking/api/monthly-reports?page=0&size=20&sort=id,desc"
+          }
+        },
+        {
+          "name": "Create Monthly Report",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) pm.collectionVariables.set('monthly_report_id', pm.response.json().id);"] }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardId\": \"CARD001\",\n  \"month\": 6,\n  \"year\": 2026,\n  \"totalMinutes\": 150,\n  \"totalAmount\": 15000\n}"
+            },
+            "url": "{{gatewayUrl}}/services/parking/api/monthly-reports"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Password Reset Requests",
+      "item": [
+        {
+          "name": "List Password Reset Requests",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": "{{gatewayUrl}}/services/parking/api/password-reset-requests?page=0&size=20&sort=id,desc"
+          }
+        },
+        {
+          "name": "Create Password Reset Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) pm.collectionVariables.set('password_reset_request_id', pm.response.json().id);"] }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"SV001\",\n  \"name\": \"Nguyen Van A\",\n  \"licensePlate\": \"59A1-12345\",\n  \"username\": \"nguyenvana\",\n  \"newPasswordHash\": \"hash-demo\",\n  \"status\": \"PENDING\",\n  \"requestedAt\": \"2026-06-01T08:00:00Z\",\n  \"processedAt\": null,\n  \"processedBy\": null,\n  \"rejectReason\": null\n}"
+            },
+            "url": "{{gatewayUrl}}/services/parking/api/password-reset-requests"
+          }
+        }
+      ]
+    }
+  ]
+}
