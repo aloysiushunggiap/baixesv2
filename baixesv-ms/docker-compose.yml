@@ -22,11 +22,11 @@ services:
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:admin@jhipster-registry:8761/eureka
       - SPRING_CLOUD_CONFIG_URI=http://admin:admin@jhipster-registry:8761/config
-      - SPRING_DATASOURCE_URL=jdbc:h2:mem:gateway;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
-      - SPRING_DATASOURCE_USERNAME=gateway
-      - SPRING_DATASOURCE_PASSWORD=
-      - SPRING_JPA_DATABASE_PLATFORM=io.github.jhipster.domain.util.FixedH2Dialect
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/baixesv_gateway?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1111
+      - SECURITY_OAUTH2_CLIENT_ACCESS_TOKEN_URI=http://uaa:9999/oauth/token
+      - OAUTH2_SIGNATURE_VERIFICATION_PUBLIC_KEY_ENDPOINT_URI=http://uaa:9999/oauth/token_key
       - JHIPSTER_SLEEP=60
     ports:
       - '8080:8080'
@@ -43,16 +43,18 @@ services:
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:admin@jhipster-registry:8761/eureka
       - SPRING_CLOUD_CONFIG_URI=http://admin:admin@jhipster-registry:8761/config
-      - SPRING_DATASOURCE_URL=jdbc:h2:mem:uaa;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
-      - SPRING_DATASOURCE_USERNAME=uaa
-      - SPRING_DATASOURCE_PASSWORD=
-      - SPRING_JPA_DATABASE_PLATFORM=io.github.jhipster.domain.util.FixedH2Dialect
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/baixesv_uaa?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1111
       - JHIPSTER_SLEEP=60
     ports:
       - '9999:9999'
     depends_on:
       - jhipster-registry
+    networks:
+      default:
+        aliases:
+          - uaa
 
   parking-app:
     image: parking
@@ -65,6 +67,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/baixesv_parking?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1111
+      - SECURITY_OAUTH2_CLIENT_ACCESS_TOKEN_URI=http://uaa:9999/oauth/token
+      - OAUTH2_SIGNATURE_VERIFICATION_PUBLIC_KEY_ENDPOINT_URI=http://uaa:9999/oauth/token_key
       - JHIPSTER_SLEEP=60
     ports:
       - '8081:8081'
