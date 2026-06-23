@@ -9,6 +9,10 @@ services:
       - SPRING_PROFILES_ACTIVE=dev,swagger,uaa
       - SPRING_SECURITY_USER_PASSWORD=admin
       - JHIPSTER_REGISTRY_PASSWORD=admin
+      # Development mode: remove stopped/crashed services promptly instead of
+      # keeping stale "UP" instances through Eureka self-preservation.
+      - EUREKA_SERVER_ENABLE_SELF_PRESERVATION=false
+      - EUREKA_SERVER_EVICTION_INTERVAL_TIMER_IN_MS=5000
       - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_TYPE=native
       # The registry is used by services started directly from IntelliJ/Gradle.
       # Dockerized apps still override Eureka with their own environment variable below.
