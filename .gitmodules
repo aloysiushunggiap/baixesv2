@@ -1,0 +1,11 @@
+[submodule "baixesv-ms/gateway"]
+	path = baixesv-ms/gateway
+	url = ./baixesv-ms/gateway
+
+[submodule "baixesv-ms/parking"]
+	path = baixesv-ms/parking
+	url = ./baixesv-ms/parking
+
+[submodule "baixesv-ms/uaa"]
+	path = baixesv-ms/uaa
+	url = ./baixesv-ms/uaa
